@@ -13,26 +13,29 @@ class Home extends CI_Controller {
         Braintree_Configuration::publicKey('j9qkckxf7nzg92jy');
         Braintree_Configuration::privateKey('e8a5dfa2b30d63bce76f077dc1efe2f3');
 
-        echo($clientToken = Braintree_ClientToken::generate());
+        $data['clientToken'] = Braintree_ClientToken::generate();
 
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
 
+            $result = Braintree_Transaction::sale([
+                        'amount' => '3.00',
+                        'creditCard' => array(
+                            'number' => $this->input->post('number'),
+                            'expirationDate' => '08/19'
+                        ),
+                        'options' => [
+                            'submitForSettlement' => True
+                        ]
+            ]);
 
-//        $result = Braintree_Transaction::sale([
-//                    'amount' => '3.00',
-//                    'creditCard' => array(
-//                        'number' => $this->input->post('number'),
-//                        'expirationDate' => '08/19'
-//                    ),
-//                    'options' => [
-//                        'submitForSettlement' => True
-//                    ]
-//        ]);
-//
-//        if ($result) {
-//            echo "<pre>";
-//            print_r($result);
-//            echo "</pre>";
-//        }
+            if ($result) {
+                echo "<pre>";
+                print_r($result);
+                echo "</pre>";
+            }
+        } else {
+            $this->load->view('pay_v', $data);
+        }
     }
 
 }
