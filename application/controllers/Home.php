@@ -8,34 +8,48 @@ class Home extends CI_Controller {
     }
 
     public function pay() {
+
         Braintree_Configuration::environment('sandbox');
-        Braintree_Configuration::merchantId('h3cjzwqgvr6fc6zh');
-        Braintree_Configuration::publicKey('j9qkckxf7nzg92jy');
-        Braintree_Configuration::privateKey('e8a5dfa2b30d63bce76f077dc1efe2f3');
+        Braintree_Configuration::merchantId('mjbdtwcmfw2dgfk6');
+        Braintree_Configuration::publicKey('6wqdqpbgqp3sng6s');
+        Braintree_Configuration::privateKey('dcbdab7bf07c30aa454d16e56ac16075');
 
         $data['clientToken'] = Braintree_ClientToken::generate();
+        // $data['clientToken'] = Braintree_ClientToken::generate([
+        //     "customerId" => 'abirroy8813'
+        // ]);
+        $this->load->view("pay",$data);
 
-        if ($this->input->server('REQUEST_METHOD') === 'POST') {
+        // FOR REAL LIFE SITUATION
+        // $nonceFromTheClient = $_POST["payment_method_nonce"];
+        //  $result = Braintree_Transaction::sale([
+        //    'amount' => '3.00',
+        //    'creditCard' => array(
+        //        'number' => '4111 1111 1111 1111',
+        //        'expirationDate' => '08/19'
+        //    ),
+        //    'options' => [
+        //        'submitForSettlement' => True
+        //    ]
+        //  ]);
+        $result = Braintree_Transaction::sale([
+          'amount' => '80.00',
+          'creditCard' => array(
+                 'number' => '',
+                 'expirationDate' => '6011111111111117',
+                 'cvv' => ''
+             ),
+          'paymentMethodNonce' => 'fake-valid-nonce',
+          'options' => [
+            'submitForSettlement' => True
+          ]
+        ]);
 
-            $result = Braintree_Transaction::sale([
-                        'amount' => '3.00',
-                        'creditCard' => array(
-                            'number' => $this->input->post('number'),
-                            'expirationDate' => '08/19'
-                        ),
-                        'options' => [
-                            'submitForSettlement' => True
-                        ]
-            ]);
-
-            if ($result) {
-                echo "<pre>";
-                print_r($result);
-                echo "</pre>";
-            }
-        } else {
-            $this->load->view('pay_v', $data);
-        }
+       if ($result) {
+           echo "<pre>";
+           print_r("Success!");
+           echo "</pre>";
+       }
     }
 
 }
